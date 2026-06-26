@@ -1,0 +1,26 @@
+[package]
+name = "fleet_manager"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Runtime asíncrono
+tokio = { version = "1.35", features = ["full"] }
+rumqttc = "0.24"
+
+# Interfaz con la base de datos
+sqlx = { version = "0.7", features = [
+    "runtime-tokio-rustls", 
+    "postgres", 
+    "macros", 
+    "chrono", 
+    "uuid"
+] }
+serde_json = "1.0"
+# Para leer variables de entorno (el archivo .env)
+dotenvy = "0.15"
+heapless = "0.9.3"
+
+# Nuestro protocolo compartido (Ajusta la ruta si es necesario)
+shared_protocol = { path = "../shared_protocol" }
+chrono = "0.4.45"

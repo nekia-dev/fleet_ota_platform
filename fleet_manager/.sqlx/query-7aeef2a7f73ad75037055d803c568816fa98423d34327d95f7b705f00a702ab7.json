@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    INSERT INTO device_telemetry (mac_address, status, version, last_seen) \n                    VALUES ($1, $2, $3, NOW())\n                    ON CONFLICT (mac_address) \n                    DO UPDATE SET \n                        status = EXCLUDED.status,\n                        version = EXCLUDED.version,\n                        last_seen = NOW()\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7aeef2a7f73ad75037055d803c568816fa98423d34327d95f7b705f00a702ab7"
+}

@@ -1,0 +1,22 @@
+[workspace]
+members = [
+    "esp_ota_client", 
+    "shared_protocol",
+    "fleet_manager"]
+resolver = "2"
+
+# Esto fuerza la versión de heapless para todo el proyecto,
+# evitando que crates internos usen versiones distintas.
+[workspace.dependencies]
+
+serde = { version = "1.0", features = ["derive"] }
+heapless = "0.9.6"
+
+[profile.release]
+opt-level = "s" # Optimiza para que el binario ocupe poco en la memoria Flash
+lto = "fat"     # Hace que el código C y Rust se fusionen para ir más rápido
+
+[profile.dev]
+debug = true
+opt-level = "z"
+

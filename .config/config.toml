@@ -1,0 +1,13 @@
+# --- Configuración para ESP32-S3 (la que necesitamos ahora) ---
+[target.xtensa-esp32s3-espidf]
+linker = "ldproxy"
+# Esto permite que al hacer 'cargo run' se flashee automáticamente
+runner = "espflash flash --monitor"
+
+[build]
+# Opcional: puedes dejar uno por defecto, pero es mejor especificarlo en el comando
+# target = "xtensa-esp32s3-espidf" 
+
+[env]
+# Necesario para que esp-idf-sys sepa qué chip compilar
+MCU = "esp32s3"

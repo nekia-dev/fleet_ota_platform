@@ -1,0 +1,37 @@
+[package]
+name = "esp_ota_client"
+version = "0.1.0"
+authors = ["Iván Barra <ibn963@proton.me>"]
+edition = "2021"
+resolver = "2"
+rust-version = "1.82"
+
+[[bin]]
+name = "esp_ota_client"
+harness = false 
+
+[dependencies]
+esp-idf-sys = { version = "0.37", features = ["binstart"] }
+esp-idf-svc = { version = "0.52.1", features = ["std", "alloc", "critical-section"] }
+esp-idf-hal = "0.46.1"
+embedded-svc = ">=0.28.1, <0.30.0" # O la versión que utilice Somnia
+embassy-executor = { version = "0.10.0", features = ["executor-thread"] }
+embassy-time = "0.5.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dotenvy = "0.15"
+log = "0.4"
+heapless = "0.9.3"
+shared_protocol = { path = "../shared_protocol" }
+anyhow = "1.0"
+
+[build-dependencies]
+embuild = "0.33"
+
+# 1. Esto le dice al compilador de Rust cómo construir el firmware (LO QUE YA TIENES)
+[package.metadata.esp-idf-sys]
+esp_idf_sdkconfig_defaults = ["sdkconfig.defaults"]
+
+
+
+

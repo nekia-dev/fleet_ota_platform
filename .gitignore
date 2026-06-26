@@ -1,0 +1,15 @@
+# Credenciales y Variables
+.env
+.env.local
+.env.example
+.envvrc
+# Binarios y compilaciones
+/target
+.embuild/
+/build
+migrations/
+# Configuraciones locales de IDE
+.vscode/
+.idea/
+.cargo/config.toml
+artefactos_ota/

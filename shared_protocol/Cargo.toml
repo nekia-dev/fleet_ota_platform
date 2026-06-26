@@ -1,0 +1,11 @@
+[package]
+name = "shared_protocol"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Cambia tu línea actual de heapless por esta:
+heapless = "0.9.3"
+
+# Asegúrate de tener serde con derive:
+serde = { version = "1.0", features = ["derive"] }
