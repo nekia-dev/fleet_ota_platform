@@ -1,6 +1,3 @@
-Entendido. Una arquitectura robusta no sirve de nada si el conocimiento reside únicamente en nuestra cabeza. Escribir esta guía es el paso correcto para blindar el proyecto y permitir que cualquier ingeniero que se incorpore sea productivo desde el día uno.
-
-Aquí tienes el Documento de Procedimiento Operativo Estándar (SOP) para el proyecto **FLEET_OTA**.
 
 ---
 
@@ -29,7 +26,6 @@ El sistema no expone servicios a la Internet pública. Todo el tráfico de contr
 
 * **Servidores de Producción (Puentes / Gateways Locales):**
 * **Función:** Servidores intermedios en las redes locales. Ejecutan un broker Mosquitto configurado como *Bridge* que retransmite el tráfico local hacia Dracarys, actuando como orquestadores locales antes de enviar las placas al campo.
-
 
 
 ## 3. Arquitectura del Hardware (El Nodo)

@@ -9,6 +9,14 @@
 * **Servidor Local (Host BD / Tailscale IP):** `100.96.254.3`
 * **Nodos:** ESP32-S3 (Topic base: `flota/status/{MAC}` y `flota/cmd/{MAC}`)
 
+# Punto de Trabajo (Servidor de Desarrollo): IP 100.96.254.3/32.
+
+ ***Este es el nodo donde reside el entorno de compilación, el broker MQTT local y el cliente de despliegue directo. Estamos trabajando físicamente sobre esta instancia.
+
+ ***Servidor Central (Dracarys / Backend): IP 100.107.177.78.
+
+ ***Este es el nodo que gestiona el repositorio maestro de binarios y donde se consolidan los datos a largo plazo.
+
 ---
 
 ## 2. Operaciones de Terminal: MQTT (Mosquitto)
