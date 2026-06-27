@@ -11,7 +11,7 @@ name = "esp_ota_client"
 harness = false 
 
 [dependencies]
-esp-idf-sys = { version = "0.37", features = ["binstart"] }
+esp-idf-sys = { version = "0.37.2", features = ["binstart"] }
 esp-idf-svc = { version = "0.52.1", features = ["std", "alloc", "critical-section"] }
 esp-idf-hal = "0.46.1"
 embedded-svc = ">=0.28.1, <0.30.0" # O la versión que utilice Somnia
@@ -32,6 +32,5 @@ embuild = "0.33"
 [package.metadata.esp-idf-sys]
 esp_idf_sdkconfig_defaults = ["sdkconfig.defaults"]
 
-
-
-
+[package.metadata.espflash]
+partition_table = "partitions.csv"

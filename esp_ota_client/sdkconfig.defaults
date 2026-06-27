@@ -9,4 +9,9 @@ CONFIG_FREERTOS_IDLE_TASK_STACKSIZE=4096
 # You might have to increase this further if you spawn your own Rust threads 
 # that allocate large stack variables; or better yet - use 
 # `std::thread::Builder::new().stack_size(XXX)` for spawning
+# `std::thread::Builder::new().stack_size(XXX)` for spawning
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="${project_dir}/../partitions.csv"
+CONFIG_PARTITION_TABLE_FILENAME="${project_dir}/../partitions.csv"
 CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT=4096

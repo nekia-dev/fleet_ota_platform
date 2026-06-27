@@ -6,8 +6,9 @@ runner = "espflash flash --monitor"
 
 [build]
 # Opcional: puedes dejar uno por defecto, pero es mejor especificarlo en el comando
-# target = "xtensa-esp32s3-espidf" 
+target = "xtensa-esp32s3-espidf" 
 
 [env]
 # Necesario para que esp-idf-sys sepa qué chip compilar
 MCU = "esp32s3"
+ESP_IDF_PYTHON_BIN = "/usr/bin/python3.11"

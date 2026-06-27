@@ -1,40 +1,65 @@
-use esp_idf_svc::mqtt::client::{EspMqttClient, MqttClientConfiguration, QoS};
+// esp_ota_client/src/mqtt.rs
+use esp_idf_svc::mqtt::client::{EspMqttClient, MqttClientConfiguration, QoS, EventPayload};
 use esp_idf_svc::ota::EspOta;
-use shared_protocol::{DeviceStatus, DeviceState, ProtocolString};
-use std::time::Duration;
+use shared_protocol::{DeviceStatus, DeviceState, ProtocolString, OtaCommand};
+use std::time::{Duration, Instant};
+use log::{error, info};
 
 pub fn mqtt_start_blocking(broker_url: &str, mac_address: String) {
     let mqtt_config = MqttClientConfiguration::default();
-    let (mut client, _connection) = EspMqttClient::new(broker_url, &mqtt_config).unwrap();
     
+    let (mut client, mut connection) = match EspMqttClient::new(broker_url, &mqtt_config) {
+        Ok(c) => c,
+        Err(e) => {
+            error!("Error inicializando MQTT: {:?}", e);
+            return;
+        }
+    };
+
     let topic_status = format!("flota/status/{}", mac_address);
-    let mut ota = EspOta::new().unwrap();
+    let topic_cmd = format!("flota/cmd/{}", mac_address);
 
     loop {
-        // 1. Declaramos ota y slot explícitamente para que existan
-        if let Ok(slot) = ota.get_running_slot() {
-            let label = slot.label; // Label es un string que podemos convertir
-            
-            // 2. Creamos el status con String estándar de Rust primero
-            let mut active_partition = ProtocolString::<2>::new();
-            // push_str devuelve un Result, lo ignoramos para este caso simple
+        // 1. PUBLICACIÓN
+        if let Ok(slot) = EspOta::new().unwrap().get_running_slot() {
+            let label = slot.label;
+            let mut active_partition = ProtocolString::<16>::new();
             let _ = active_partition.push_str(&label);
-
-            // Sustituye tu bloque de creación de 'status' por esto:
+            
             let status = DeviceStatus {
-                // Usamos try_from porque &str puede fallar al convertir
-                mac: ProtocolString::try_from(mac_address.as_str()).unwrap(),
-                version: ProtocolString::try_from("1.0.0").unwrap(),
+                mac: ProtocolString::try_from(mac_address.as_str()).unwrap_or_default(),
+                version: ProtocolString::try_from("1.0.0").unwrap_or_default(),
                 active_partition,
                 state: DeviceState::Idle,
                 uptime_seconds: 0,
             };
-                        // 3. Serializamos
+
             if let Ok(payload) = serde_json::to_string(&status) {
                 let _ = client.publish(&topic_status, QoS::AtMostOnce, false, payload.as_bytes());
             }
         }
 
-        std::thread::sleep(Duration::from_secs(30));
+        // 2. VENTANA DE ESCUCHA (5 segundos)
+        let _ = client.subscribe(&topic_cmd, QoS::AtLeastOnce);
+        let start_time = Instant::now();
+        
+        while start_time.elapsed() < Duration::from_secs(5) {
+            if let Ok(event) = connection.next() {
+                // Desestructuramos la variante struct directamente como nos indicó el compilador
+                if let EventPayload::Received { topic, data, .. } = event.payload() {
+                    // topic es un Option<&str>, data es un &[u8]
+                    if topic == Some(topic_cmd.as_str()) {
+                        info!("📥 Comando OTA detectado");
+                        // Usamos directamente 'data' que extrajimos arriba
+                        if let Ok(cmd) = serde_json::from_slice::<OtaCommand>(data) {
+                            info!("🚀 Ejecutando OTA: URL={}", cmd.download_url.as_str());
+                            // AQUÍ SE INYECTARÁ LA DESCARGA
+                        }
+                    }
+                }
+            }
+        }
+        
+        std::thread::sleep(Duration::from_secs(30)); 
     }
 }

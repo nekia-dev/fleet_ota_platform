@@ -1,15 +1,20 @@
 # Credenciales y Variables
+# Directorios de compilación de Rust
+/target/
+
+# Toolchain de C/C++ y binarios generados por ESP-IDF
+/.embuild/
+/dependencies/
+sdkconfig
+
+# Variables de Entorno y Credenciales (¡Crítico!)
 .env
-.env.local
-.env.example
-.envvrc
-# Binarios y compilaciones
-/target
-.embuild/
-/build
-migrations/
-# Configuraciones locales de IDE
-.vscode/
-.idea/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Ignorar la configuración local de cargo SI contiene rutas absolutas de tu PC.
+# (Si .cargo/config.toml solo tiene configuraciones genéricas del target de compilación, 
+# puedes borrar esta línea y versionarlo).
 .cargo/config.toml
-artefactos_ota/

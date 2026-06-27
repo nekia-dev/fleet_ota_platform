@@ -1,3 +1,4 @@
+// esp_ota_client/src/main.rs
 use anyhow::Result;
 use esp_idf_hal::peripherals::Peripherals;
 use esp_idf_svc::eventloop::EspSystemEventLoop;
@@ -34,7 +35,7 @@ fn main() -> Result<()> {
 
     // Esperar conexión
     while !wifi.is_connected()? {
-        std::thread::sleep(std::time::Duration::from_millis(500));
+    std::thread::sleep(std::time::Duration::from_millis(500));
     }
 
     // Obtener MAC
@@ -45,7 +46,7 @@ fn main() -> Result<()> {
     info!("✅ WiFi conectado. MAC: {}", device_mac);
 
     // Iniciar MQTT
-    mqtt::mqtt_start_blocking("mqtt://192.168.1.XX:1883", device_mac);
+    mqtt::mqtt_start_blocking("mqtt://192.168.1.42:1883", device_mac);
     Ok(())
 }
 

@@ -21,7 +21,7 @@ pub enum DeviceState {
 pub struct DeviceStatus {
     pub mac: ProtocolString<17>,
     pub version: ProtocolString<8>,
-    pub active_partition: ProtocolString<2>, // "A" o "B"
+   pub active_partition: ProtocolString<16>,// "A" o "B"
     pub state: DeviceState,
     pub uptime_seconds: u64,
 }

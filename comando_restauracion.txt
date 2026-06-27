@@ -1,0 +1,9 @@
+# Limpieza profunda de los artefactos de Rust y CMake
+cargo clean
+rm -rf target/
+rm -rf .embuild/ (Si CMake está corrupto)
+
+# Fijar el entorno y flashear
+export ESP_IDF_PYTHON_BIN=/usr/bin/python3.11
+export ESP_IDF_SYS_ROOT_CRATE=esp_ota_client
+cargo espflash flash --monitor --release --partition-table partitions.csv
