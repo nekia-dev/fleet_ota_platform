@@ -1,0 +1,2 @@
+ltc@ltc:~/fleet_ota_platform/fleet_manager$ cargo build --target x86_64-unknown-linux-gnu
+ltc@ltc:~/fleet_ota_platform/fleet_manager$ cargo run --target x86_64-unknown-linux-gnu

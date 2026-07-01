@@ -7,6 +7,7 @@ edition = "2021"
 # Runtime asíncrono
 tokio = { version = "1.35", features = ["full"] }
 rumqttc = "0.24"
+libc = { version = "0.2", features = ["extra_traits"] }
 
 # Interfaz con la base de datos
 sqlx = { version = "0.7", features = [
@@ -24,3 +25,10 @@ heapless = "0.9.3"
 # Nuestro protocolo compartido (Ajusta la ruta si es necesario)
 shared_protocol = { path = "../shared_protocol" }
 chrono = "0.4.45"
+
+# 1. Esto le dice al compilador de Rust cómo construir el firmware (LO QUE YA TIENES)
+# [package.metadata.esp-idf-sys]
+# esp_idf_sdkconfig_defaults = ["sdkconfig.defaults"]
+
+# [package.metadata.espflash]
+# partition_table = "partitions.csv"

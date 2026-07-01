@@ -1,0 +1,3 @@
+[build]
+# Forzamos el uso de la arquitectura de tu PC (x86_64 Linux)
+target = "x86_64-unknown-linux-gnu"

@@ -1,0 +1,7 @@
+[env]
+# Estas variables se cargan automáticamente al ejecutar cargo build, flash, etc.
+ESP_IDF_PYTHON_BIN = "/usr/bin/python3.11"
+ESP_IDF_SYS_ROOT_CRATE = "esp_ota_client"
+
+[build]
+target = "x86_64-unknown-linux-gnu" # O el target de tu máquina local

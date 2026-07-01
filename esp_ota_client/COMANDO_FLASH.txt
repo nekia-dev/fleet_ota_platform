@@ -1,0 +1,1 @@
+ltc@ltc:~/fleet_ota_platform/esp_ota_client$ cargo espflash flash --monitor --release --partition-table partitions.csv

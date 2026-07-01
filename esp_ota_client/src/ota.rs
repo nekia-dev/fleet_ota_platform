@@ -1,58 +1,78 @@
 // ============================================================================
 // Archivo: esp_ota_client/src/ota.rs
 // Proyecto: FLEET_OTA
-// Autor: Iván Barra
-// Fecha: 2026-06-27
-// Descripción: Ejecución de transferencia OTA, validación de integridad y 
-//              rollback preventivo mediante EspOtaUpdate.
+// Módulo: OTA Engine (FSM) - Versión Auditable
+// Fecha: 2026-06-30
 // ============================================================================
 
-use esp_idf_svc::ota::EspOta;
-use esp_idf_svc::http::client::{Configuration, EspHttpConnection};
-use embedded_svc::http::client::Client;
+use crate::hal::OtaFlash;
 use shared_protocol::OtaCommand;
-use std::time::Duration;
-use std::io::Read;
-use log::{info, error, warn};
+use log::{info, error};
 
-pub fn run_ota_transfer(comando: &OtaCommand) -> anyhow::Result<()> {
-    info!("📡 [OTA] Inicio de transferencia. Versión: {}", comando.target_version);
+#[derive(Debug)]
+pub enum OtaError {
+    VersionRejected,
+    PartitionReadFailed,
+    EraseFailed,
+    WriteFailed,
+    IntegrityFailed,
+    SwitchFailed,
+    #[allow(dead_code)]
+    DownloadFailed,
+}
 
-    // 1. Inicialización de sesión
-    let ota = EspOta::new()?;
-    let mut update = ota.initiate_update()?;
-    
-    // 2. Conexión HTTP
-    let connection = EspHttpConnection::new(&Configuration::default())?;
-    let mut client = Client::wrap(connection);
-    
-    let request = client.get(&comando.download_url)?;
-    let mut response = request.submit()?;
-    
-    if response.status() != 200 {
-        error!("🚨 [OTA] Error HTTP: {}", response.status());
-        return Err(anyhow::anyhow!("Falló la descarga HTTP"));
+pub struct OtaEngine<F: OtaFlash> {
+    flash: F,
+    current_version: &'static str,
+}
+
+impl<F: OtaFlash> OtaEngine<F> {
+    pub fn new(flash: F, current_version: &'static str) -> Self {
+        Self { flash, current_version }
     }
 
-    // 3. Bucle de escritura y validación (4KB alineados)
-    let mut buffer = [0u8; 4096];
-    let mut total_bytes = 0;
-    
-    info!("⏳ [OTA] Escribiendo en Flash...");
-    while let Ok(bytes_read) = response.read(&mut buffer) {
-        if bytes_read == 0 { break; }
-        update.write(&buffer[..bytes_read])?;
-        total_bytes += bytes_read;
+    pub fn execute_update(&self, cmd: &OtaCommand) -> Result<(), OtaError> {
+        info!("[OTA] Iniciando actualización a v{}", cmd.target_version);
+
+        if !self.is_version_safe(&cmd.min_version_required) {
+            error!("[OTA] Versión rechazada. Mínima requerida: {}", cmd.min_version_required);
+            return Err(OtaError::VersionRejected);
+        }
+
+        let current_slot = self.flash.get_active_partition()
+            .map_err(|_| OtaError::PartitionReadFailed)?;
+
+        let target_slot = if current_slot == "ota_0" { "ota_1" } else { "ota_0" };
+
+        info!("[OTA] Slot actual: {} → Destino: {}", current_slot, target_slot);
+
+        // Preparación
+        self.flash.erase_partition(target_slot)
+            .map_err(|_| OtaError::EraseFailed)?;
+
+        // TODO: Descarga real HTTP aquí
+
+        // Simulación temporal
+        info!("[OTA] Escribiendo firmware (simulado)...");
+        let dummy = [0u8; 1024];
+        self.flash.write_chunk(target_slot, 0, &dummy)
+            .map_err(|_| OtaError::WriteFailed)?;
+
+        // Verificación
+        if !self.flash.verify_integrity(target_slot, cmd.checksum.as_bytes())
+            .map_err(|_| OtaError::IntegrityFailed)? {
+            return Err(OtaError::IntegrityFailed);
+        }
+
+        // Commit
+        self.flash.switch_to_partition(target_slot)
+            .map_err(|_| OtaError::SwitchFailed)?;
+
+        info!("[OTA] Actualización completada. Reinicio pendiente.");
+        Ok(())
     }
-    
-    // 4. Finalización y marcado como app válida (Pendiente de validación tras boot)
-    update.complete()?;
-    info!("✅ [OTA] Descarga completada. {} bytes.", total_bytes);
-    
-    // 5. Configuración de reinicio
-    info!("🔄 [OTA] Reiniciando en 3s...");
-    std::thread::sleep(Duration::from_secs(3));
-    
-    unsafe { esp_idf_sys::esp_restart() };
-    Ok(())
+
+    fn is_version_safe(&self, min_version: &str) -> bool {
+        self.current_version >= min_version
+    }
 }

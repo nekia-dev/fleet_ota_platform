@@ -9,10 +9,13 @@ sdkconfig
 
 # Variables de Entorno y Credenciales (¡Crítico!)
 .env
-
+.envrc
+.bin
+firmware_storage/*.bin
 # Archivos del sistema operativo
 .DS_Store
 Thumbs.db
+Cargo.lock
 
 # Ignorar la configuración local de cargo SI contiene rutas absolutas de tu PC.
 # (Si .cargo/config.toml solo tiene configuraciones genéricas del target de compilación, 

@@ -2,31 +2,37 @@
 # ============================================================================
 # Archivo: flash_ota.sh
 # Proyecto: FLEET_OTA
-# Descripción: Script para compilar y flashear el firmware en nodos ESP32-S3.
+# Descripción: Script de despliegue con validación de entorno.
+# Uso:  ./flash_ota.sh           (build incremental + flash, rápido)
+#       ./flash_ota.sh --clean   (limpieza profunda + flash, tras cambiar .env)
 # ============================================================================
 
-# Define o diretório do projeto e arquivos críticos
+set -e
+
 PARTITION_FILE="partitions.csv"
+REQUIRED_ENV="MQTT_BROKER_URL_LOCAL_HOST"
 LOG_PREFIX="[FLEET_OTA FLASH]"
 
-echo "$LOG_PREFIX Iniciando processo de deployment..."
+echo "$LOG_PREFIX Iniciando proceso de despliegue..."
 
-# 1. Verifica se a tabela de partição existe
-if [ ! -f "$PARTITION_FILE" ]; then
-    echo "$LOG_PREFIX ERRO: $PARTITION_FILE não encontrado."
+# 1. Validar variables de entorno (blindaje contra errores de compilación)
+if [ -z "${!REQUIRED_ENV}" ]; then
+    echo "$LOG_PREFIX ERROR: Variable de entorno '$REQUIRED_ENV' no definida."
+    echo "       Verifique que direnv cargó el .env (cd al proyecto)."
     exit 1
 fi
 
-# 2. Executa o build e flash
-# Usamos --release para garantir a otimização de performance (-Os)
-echo "$LOG_PREFIX Executando build e flash com $PARTITION_FILE..."
+# 2. Limpieza OPCIONAL (solo con --clean; cargo clean recompila esp-idf entero)
+if [ "$1" == "--clean" ]; then
+    echo "$LOG_PREFIX Limpieza profunda solicitada (cargo clean)..."
+    cargo clean
+fi
 
-cargo espflash flash --monitor --release --partition-table "$PARTITION_FILE"
-
-# 3. Verifica o código de saída
-if [ $? -eq 0 ]; then
-    echo "$LOG_PREFIX Deploy concluído com sucesso."
+# 3. Build y Flash
+echo "$LOG_PREFIX Compilando con Broker: ${!REQUIRED_ENV}"
+if cargo espflash flash --monitor --release --partition-table "$PARTITION_FILE"; then
+    echo "$LOG_PREFIX Deploy concluido con éxito en $(date)."
 else
-    echo "$LOG_PREFIX ERRO: Falha no processo de flash."
+    echo "$LOG_PREFIX ERROR: El proceso de flasheo falló."
     exit 1
 fi

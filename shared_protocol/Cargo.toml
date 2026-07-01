@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 # Cambia tu línea actual de heapless por esta:
-heapless = "0.9.3"
+heapless = { version = "0.9.3", features = ["serde"] }
 
 # Asegúrate de tener serde con derive:
 serde = { version = "1.0", features = ["derive"] }

@@ -2,7 +2,8 @@
 members = [
     "esp_ota_client", 
     "shared_protocol",
-    "fleet_manager"]
+    "fleet_manager",
+    "ota_server"]
 resolver = "2"
 
 # Esto fuerza la versión de heapless para todo el proyecto,
@@ -11,6 +12,7 @@ resolver = "2"
 
 serde = { version = "1.0", features = ["derive"] }
 heapless = "0.9.6"
+axum = { version = "0.7", features = ["headers"] }
 
 [profile.release]
 opt-level = "s" # Optimiza para que el binario ocupe poco en la memoria Flash
